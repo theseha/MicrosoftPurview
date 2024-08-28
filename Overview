@@ -1,0 +1,21 @@
+Microsoft Purview는 기업이 보유한 데이터에 대한 Visibility를 제공하고, 데이터의 Lifecycle 동안 보호를 할 수 있으며, 데이터 유출 등의 위험한 행위를 탐지 및 차단을 합니다.
+
+Microsoft Purview는 데이터 보안 및 Governance 기능을 제공하는 솔루션의 집합을 대표하는 Brand Name입니다.
+이 안에, Microsoft Purview Information Protection, Microsoft Purview Data Loss Prevention, Microsoft Purview Insider Risk Management, Microsoft Purview Communication Compliance, Microsoft Purview eDiscovery 등 여러 기능이 포함되어 있습니다.
+
+각 기능을 적용하는데 있어, 선행되어야 할 작업은 어느 데이터가 중요한지에 대한 기준, 그리고 어느 데이터 분류 체계를 가져갈지에 대한 검토입니다.
+'어느 데이터가 중요한지'는 Sensitive Information Type (중요 정보 유형) 으로 구현을 할 수 있으며, '어느 데이터 분류 체계'는 Sensitivity Label (민감도 레이블) 로 표현할 수 있도록 구분되어야 합니다.
+
+Sensitive Information Type은, Microsoft가 기본 제공하는 Template들이 있는데, 각 Template이 어느 조건으로 정의가 되어 있는지 MS Learn - Sensitive information type entity definitions (https://learn.microsoft.com/en-us/purview/sit-sensitive-information-type-entity-definitions) 에서 제공하는 내용을 확인하시기 바랍니다.
+
+예를 들어, 'South Korea resident registration number (한국 주민등록번호)' 의 경우, 'YYMMDD-XXXXXXX'처럼 생년월일로 이루어진 6개의 숫자와 Hyphen, 그리고 랜덤한 7개의 숫자를 탐지한다고 소개되어 있습니다. (https://learn.microsoft.com/en-us/purview/sit-defn-south-korea-resident-registration-number)
+그리고 High Confidence, Medium Confidence, Low Confidence의 조건을 선택할 수 있는데, High Confidence의 경우, 위의 패턴과 관련 키워드 ('주민등록번호', 'Jumin deungnok beonho', 'National ID card' 등 - 위 MS Learn 링크 참고) 가 함께 기록되어 있는 경우에만 탐지를 하며, Medium Confidence의 경우 키워드와 상관없이 패턴만으로 탐지를 하게 됩니다.
+여기서, 패턴의 뒷자리 7자리 숫자가 구체적으로 정의되어 있지 않아서 발생하는 False Positive를 최대한 줄이고 싶다면, ^\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])[-]?[1-4]\d{6}$ 와 같이 정규표현식을 작성하여 새로운 Sensitive Information Type을 생성하시면 됩니다.
+
+Sensitivity Label은, 각 기업 환경에서 다루는 전체 데이터 중 중요도에 따라, 다루는 사람에 따라, 권한에 따라 체계를 분류하는 작업이 필요합니다. (https://learn.microsoft.com/en-us/purview/sensitivity-labels)
+
+Microsoft에서는 Non-Business, Public, General, Confidential, Highly Confidential, 이렇게 5개의 등급으로 구분을 하고 있고, Confidential과 Highly Confidential의 등급에 대해서는 암호화를 적용하고 있습니다.
+등급 분류는 각 기업마다 다루는 데이터의 종류 및 중요도에 따라 모두 다를 수가 있기 때문에, 내부적으로 진지한 검토가 이루어져야 할 것 같습니다.
+현재 (2024년 8월) 기준, 금융위원회가 망분리 제도 개선을 위한 논의 과정에서 검토 중인 데이터 등급 분류 체계는 기밀정보 (Classified), 민감정보 (Sensitive), 공개정보 (Open), 이렇게 3 단계 입니다. 실제, 데이터 보안 등급을 위해서는 2~5개 사이를 권장하고 있고, IT와 보안 경험이 없는 사람도 포함하여 여러 사용자가 확인하게 되는 분류인 만큼 각 분류 체계의 이름은 간단하면서도 직관적이어야 합니다.
+
+나아가, 보안 등급 체계에서도 Target 별 권한, 워터마크, 데이터 만료 기간 등 세부적인 조건을 설정할 수 있으므로, 위 MS Learn의 Sensitivity Label 문서의 세부 기능을 함께 검토하는 것을 권장합니다.
